@@ -55,7 +55,7 @@ class SecretUtil:
         """take shares and attempt to recover secret by taking sum of coeff * share for all shares.
         if user indeed has at least k of n shares, then secret will be recovered."""
         list = shares.keys()
-        if self.verbose: print(list)
+        # if self.verbose: print(list)
         coeff = self.recoverCoefficients(list)
         secret = 0
         for i in list:

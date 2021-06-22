@@ -18,12 +18,12 @@ def createAttribute(s, loc, toks):
 
 # convert 'attr < value' to a binary tree based on 'or' and 'and'
 def parseNumConditional(s, loc, toks):
-    print("print: %s" % toks)
+    # print("print: %s" % toks)
     return MFNode(toks[0])
 
 
 def printStuff(s, loc, toks):
-    print("print: %s" % toks)
+    # print("print: %s" % toks)
     return toks
 
 
@@ -209,19 +209,19 @@ class PolicyParser:
         return
 
 
-if __name__ == "__main__":
-    # policy parser test cases
-    parser = PolicyParser()
-    attrs = ['1', '3', '7', '8', '5']
-    print("Attrs in user set: ", attrs)
-    # tree1 = parser.parse("(2 of 3^1^5 or 6) and (2 or 3)")
-    tree1 = parser.parse("((2 of (3, 4, 7, 8))) and (5 or 6))")
-    # tree1 = parser.parse("(1 or 2) and (2 and 3))")
-    print("case 1: ", tree1, ", pruned: ", parser.prune(tree1, attrs))
+# if __name__ == "__main__":
+#     # policy parser test cases
+#     parser = PolicyParser()
+#     attrs = ['1', '3', '7', '8', '5']
+#     print("Attrs in user set: ", attrs)
+#     # tree1 = parser.parse("(2 of 3^1^5 or 6) and (2 or 3)")
+#     tree1 = parser.parse("((2 of (3, 4, 7, 8))) and (5 or 6))")
+#     # tree1 = parser.parse("(1 or 2) and (2 and 3))")
+#     print("case 1: ", tree1, ", pruned: ", parser.prune(tree1, attrs))
 
-    tree2 = parser.parse("1 and (1 or 3)")
-    print("case 2: ", tree2, ", pruned: ", parser.prune(tree2, attrs))
+#     tree2 = parser.parse("1 and (1 or 3)")
+#     print("case 2: ", tree2, ", pruned: ", parser.prune(tree2, attrs))
 
-    tree3 = parser.parse("(1 or 2) and (4 or 3)")
-    print("case 3: ", tree3, ", pruned: ", parser.prune(tree3, attrs))
+#     tree3 = parser.parse("(1 or 2) and (4 or 3)")
+#     print("case 3: ", tree3, ", pruned: ", parser.prune(tree3, attrs))
 
