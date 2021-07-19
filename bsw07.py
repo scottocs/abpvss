@@ -1,6 +1,7 @@
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from utils.newsecretutils import SecretUtil
+import utils.newjson as newjson
 from charm.toolbox.ABEnc import ABEnc, Input, Output
 import random as mathrandom
 import time,sys
@@ -31,11 +32,28 @@ class CPabe_BSW07(ABEnc):
         
         h = g ** beta
         f = g ** ~beta
-        f2= gp ** ~beta
-        e_gg_alpha = pair(g, gp ** alpha)
         
-        mpk = { 'g':g, 'g2':gp, 'h':h, 'f':f, 'f2':f2, 'e_gg_alpha':e_gg_alpha }
+        e_gg_alpha = pair(g, gp) ** alpha
+        
+        mpk = { 'g':g, 'g2':gp, 'h':h, 'f':f, 'e_gg_alpha':e_gg_alpha }
         msk = {'beta':beta, 'g2_alpha':gp ** alpha ,"alpha":alpha}
+        # ts=time.time()
+        # mpk['g']*mpk['g']
+        # print(time.time()-ts)
+
+        # ts=time.time()
+        # mpk['g2']*mpk['g2']
+        # print(time.time()-ts)
+
+        # ts=time.time()
+        # e_gg_alpha*e_gg_alpha
+        # print(time.time()-ts)
+        
+        # ts=time.time()
+        # pair(g, gp)
+        # print(time.time()-ts)
+        # print("g",(len(newjson.dumps(g)))/1024.)
+        # print((len(newjson.dumps(g)))/1024.)
         return (mpk, msk)
     
 
@@ -45,7 +63,7 @@ class CPabe_BSW07(ABEnc):
         ts=time.time()
         r = group.random() 
         g_r = (mpk['g2'] ** r)
-        g_alpha=mpk['g'] ** msk['alpha']
+        
         ED0 = mpk['g2']**(r+msk['alpha']) #(msk['g2_alpha'] * g_r) ** (1 / msk['beta'])        
         ED1, ED2 = {}, {}
         ED3={}
@@ -84,7 +102,7 @@ class CPabe_BSW07(ABEnc):
             attr2ltidle[j]=attr2lp[j]-attr2l[j]*c            
             ha=group.hash(j, G2)
             w=group.random(ZR)
-            a1=pair(mpk['g'],mpk['g'])**w
+            a1=pair(mpk['g'],mpk['g2'])**w
             a2=pair(elgamalKeys[j]['pk'],ha)**w
             c2=group.hash((a1,a2), ZR) 
             z=w-attr2l[j]*c2
@@ -100,12 +118,13 @@ class CPabe_BSW07(ABEnc):
             for j in S:
                 ha=group.hash(j, G2)
                 g=mpk['g']
+                gp=mpk['g2']
                 z=attr2AlphaR[j]["z"]
-                x=pair(g, ED3[j])
-                y=pair(g, ED0)*pair(ha, ED2[j])/mpk['e_gg_alpha']/pair(g,ED1[j])              
+                x=pair(ED3[j], gp)
+                y=pair(g, ED0)*pair(ED2[j], ha)/mpk['e_gg_alpha']/pair(g,ED1[j])              
                 assert(ED2p[j]==g** attr2r_jtidle[j]* (elgamalKeys[j]['pk']**attr2ltidle[j]) * ED2[j]**c)
                 assert(ED3p[j]==g** attr2ltidle[j] * ED3[j]**c)                        
-                assert(attr2AlphaR[j]["a1"]==pair(g,g)**z * x**attr2AlphaR[j]["c"] and attr2AlphaR[j]["a2"]==pair(elgamalKeys[j]['pk'],ha)**z * y**attr2AlphaR[j]["c"])
+                assert(attr2AlphaR[j]["a1"]==pair(g,gp)**z * x**attr2AlphaR[j]["c"] and attr2AlphaR[j]["a2"]==pair(elgamalKeys[j]['pk'],ha)**z * y**attr2AlphaR[j]["c"])
         ret[keyV]["ver"]+=time.time()-ts              
         return {'ED0':ED0, 'ED1':ED1, 'ED2':ED2,'ED3':ED3, 'S':S}
     
@@ -117,7 +136,7 @@ class CPabe_BSW07(ABEnc):
         policy = util.createPolicy(policy_str)
         a_list = util.getAttributeList(policy)
         # 
-        (policy)
+        # (policy)
         s = group.random(ZR)
         shares = util.calculateSharesDict(s, policy)      
         # print("secret0",s)
@@ -171,8 +190,8 @@ class CPabe_BSW07(ABEnc):
             assert(stidle==z)
         ret[keyV]["ver"]+=time.time()-ts              
         return { 'C0':C0,
-                 'C1':C1, 'C2':C2, 'C3':C3, 'policy':policy_str, 'attributes':a_list }
-    
+                 'C1':C1, 'C2':C2, 'C3':C3, 'policy':policy_str}
+        
     def tInNrandom(self, t, n) :
         arr = [];
         while True:
@@ -203,8 +222,8 @@ class CPabe_BSW07(ABEnc):
 
 
 def main(nodeNum, t):   
-    groupObj = PairingGroup('SS512')
-
+    groupObj = PairingGroup('MNT159')
+#  params = {'SS512':a, 'SS1024':a1, 'MNT159':d159, 'MNT201':d201, 'MNT224':d224, 'BN254':f254 }
     # nodeNum=n
     cpabe = CPabe_BSW07(groupObj)
     # attrs = ['ONE', 'TWO', 'THREE', 'FOUR']
@@ -213,7 +232,7 @@ def main(nodeNum, t):
     access_policy = '(%d of (%s))'%(t,", ".join(attrs))
 
     # if debug: print("Attributes =>", attrs); print("Policy =>", access_policy)
-
+    print("setup :=>", "("+str(nodeNum)+","+str(len(newjson.dumps(groupObj.random(G1)))* nodeNum /1024.)+")")
     (mpk, msk) = cpabe.setup()
     elgamalKeys={}
     for attr in attrs:
@@ -221,13 +240,14 @@ def main(nodeNum, t):
         elgamalKeys[attr]={
             "sk":sk,
             "pk":mpk['g']**sk
-        }
+        }    
     # ts=time.time()    
     Enckey = cpabe.keygenAndElgamalEncAndVerify(mpk, msk, attrs, elgamalKeys)
-    # print("Enckey :=>", Enckey)
+    
     rand_msg = groupObj.random(GT)
     # if debug: print("msg =>", rand_msg)
     ct = cpabe.encryptAndVerify(mpk, rand_msg, access_policy)
+    print("distribution :=>", "("+str(nodeNum)+","+str((len(newjson.dumps(Enckey))+len(newjson.dumps(ct))-len(ct['policy'])) *2./1024)+")")
     # if debug: print("\n\nCiphertext...\n")
     # groupObj.debug(ct)
     # ret[nodeNum]["dis"]+=time.time()-ts
@@ -243,7 +263,8 @@ def main(nodeNum, t):
     for attr in attrs:
         # key["D1"][attr]= Enckey["ED1"][attr]
         key["D2"][attr]= Enckey["ED2"][attr]/(Enckey["ED3"][attr]**elgamalKeys[attr]['sk'])
-     
+    
+    print("reconstruction :=>", "("+str(nodeNum)+","+str(len(newjson.dumps(key["D2"])) *t/nodeNum/1024.)+")")
 
     rec_msg = cpabe.decrypt(mpk, key, ct)
     # if debug: print("\n\nDecrypt...\n")
@@ -257,45 +278,47 @@ if __name__ == "__main__":
     # assertExe===0? False :True
     asser=lambda x: x if x=="True" else False 
     assertExe=asser(sys.argv[1])    
-    # runtimes=100
-    # for n in range(10, 100, 10):        
-    #     print(n)
-    #     ret[n]={"dis":0,"ver":0,"rec":0}
-    #     ts=time.time()           
-    #     keyV=n
-    #     for i in range(0, runtimes):
-    #         main(n,int(n/int(sys.argv[2])))
-    #     # print("("+str(n)+", "+ str('%.2f' % (ret[n]["dis"]*1./runtimes))+") ")
-    # # print(ret)
-    # dis=""
-    # ver=""
-    # rec=""
-    # for n in range(10, 100, 10):        
-    #     dis+="("+str(n)+", "+ str('%.2f' % (ret[n]["dis"]*1./runtimes))+") "
-    #     ver+="("+str(n)+", "+ str('%.2f' % (ret[n]["ver"]*1./runtimes))+") "
-    #     rec+="("+str(n)+", "+ str('%.2f' % (ret[n]["rec"]*1./runtimes))+") "
-    # print(dis)
-    # print(ver)
-    # print(rec)
-    runtimes=50
-    n=100
-    
-    # for n in range(10, 100, 10):        
-    for t in range(1,int(n/2), 5):
-        print(t)        
-        ts=time.time()     
-        ret[t]={"dis":0,"ver":0,"rec":0}      
-        keyV=t
+    runtimes=1
+    for n in range(10, 100, 10):        
+        print(n)
+        ret[n]={"dis":0,"ver":0,"rec":0}
+        ts=time.time()           
+        keyV=n
         for i in range(0, runtimes):
-            main(n,t)
+            main(n,int(n/int(sys.argv[2])))
         # print("("+str(n)+", "+ str('%.2f' % (ret[n]["dis"]*1./runtimes))+") ")
     # print(ret)
+    dis=""
+    ver=""
     rec=""
-    for t in range(1, int(n/2), 5):        
-        # dis+="("+str(n)+", "+ str('%.2f' % (ret[t]["dis"]*1./runtimes))+") "
-        # ver+="("+str(n)+", "+ str('%.2f' % (ret[t]["ver"]*1./runtimes))+") "
-        rec+="("+str(t)+", "+ str('%.4f' % (ret[t]["rec"]*1./runtimes))+") "
+    for n in range(10, 100, 10):        
+        dis+="("+str(n)+", "+ str('%.2f' % (ret[n]["dis"]*1./runtimes))+") "
+        ver+="("+str(n)+", "+ str('%.2f' % (ret[n]["ver"]*1./runtimes))+") "
+        rec+="("+str(n)+", "+ str('%.2f' % (ret[n]["rec"]*1./runtimes))+") "
+    print(dis)
+    print(ver)
     print(rec)
+    
+# increasing t
+    # runtimes=4
+    # n=4
+    
+    # # for n in range(10, 100, 10):        
+    # for t in range(1,int(n/2), 5):
+    #     print(t)        
+    #     ts=time.time()     
+    #     ret[t]={"dis":0,"ver":0,"rec":0}      
+    #     keyV=t
+    #     for i in range(0, runtimes):
+    #         main(n,t)
+    #     # print("("+str(n)+", "+ str('%.2f' % (ret[n]["dis"]*1./runtimes))+") ")
+    # # print(ret)
+    # rec=""
+    # for t in range(1, int(n/2), 5):        
+    #     # dis+="("+str(n)+", "+ str('%.2f' % (ret[t]["dis"]*1./runtimes))+") "
+    #     # ver+="("+str(n)+", "+ str('%.2f' % (ret[t]["ver"]*1./runtimes))+") "
+    #     rec+="("+str(t)+", "+ str('%.4f' % (ret[t]["rec"]*1./runtimes))+") "
+    # print(rec)
 
 
    
