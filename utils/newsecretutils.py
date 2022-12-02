@@ -12,7 +12,14 @@ class SecretUtil:
         self.group = groupObj
 
     #        self.parser = PolicyParser()
-
+    def genCoeff(self, k):
+        # print()
+        rand = self.group.random
+        a = []  # will hold polynomial coefficients
+        for i in range(0, k):
+            a.append(rand(ZR))
+        return a
+        
     def P(self, coeff, x):
         share = coeff[0]
         newx = self.group.init(ZR, x)
@@ -84,7 +91,7 @@ class SecretUtil:
             elif (node == OpType.OR):
                 this_coeff = self.recoverCoefficients([1])
                 self._newGetCoefficientsDict(tree.getLeft(), coeff_list, coeff * this_coeff[1], useList)
-                self._newGetCoefficientsDict(tree.getRight(), coeff_list, coeff * this_coeff[1], useList)
+                self._newGetcreatePolicyCoefficientsDict(tree.getRight(), coeff_list, coeff * this_coeff[1], useList)
             elif node == OpType.THRESHOLD:
                 list2 = []
                 for i in range(len(tree.children)):
@@ -93,6 +100,7 @@ class SecretUtil:
                             list2.append(i+1)
                     else:
                         str2 = str(tree.children[i])
+                        print(useList)
                         for j in useList:
                             if str2.find(str(j)) != -1:
                                 list2.append(i+1)
