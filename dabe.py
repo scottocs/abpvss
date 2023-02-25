@@ -59,7 +59,9 @@ class DCPabe():
 
         policy = self.util.createPolicy(ct['policy'])
         pruned_list = self.util.prune(policy, K['S'])
-        
+        if not pruned_list:
+            print("The policy is not satisfied, decryption FAILED")
+            exit(0)
         # print(pruned_list)
         z = self.util.newGetCoefficients(policy, pruned_list)
         A = 1 

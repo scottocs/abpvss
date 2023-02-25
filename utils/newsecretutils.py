@@ -100,7 +100,7 @@ class SecretUtil:
                             list2.append(i+1)
                     else:
                         str2 = str(tree.children[i])
-                        print(useList)
+                        # print(useList)
                         for j in useList:
                             if str2.find(str(j)) != -1:
                                 list2.append(i+1)

@@ -25,9 +25,21 @@ class ABPVSS():
     def distribute(self,GID,M=None): 
         ts=time.time()
         attrs = ["ATTR%d@AUTH%d" % (j,j) for j in range(0, self.cpabe.N)]
-        # print(attrs)
-        # t=int(N/3)
-        access_policy = '(%d of (%s))'%(self.cpabe.t,", ".join(attrs))
+        part=int(sys.argv[1])
+        partAttrNums=int(self.cpabe.N/part)
+        # 
+        access_policy = '(%d of ('%int(part/2);
+        for i in range(0, part):
+            piece="(%d of (%s))"%(partAttrNums, ", ".join(attrs[i*partAttrNums:partAttrNums*(i+1)]))
+            access_policy += piece+","
+        
+        access_policy=access_policy[:-1]+"))"
+
+        # access_policy = '(%d of (%s))'%(self.cpabe.t,", ".join(attrs))
+        # access_policy = '(2 of ((%d of (%s)), (%d of (%s))))'%(half,", ".join(attrs[:half]),half,", ".join(attrs[half:]))
+        # access_policy = '(1 of ((%d of (%s)), (%d of (%s))))'%(partAttrNums,", ".join(attrs[:partAttrNums]),partAttrNums,", ".join(attrs[partAttrNums:]))
+
+        # print(access_policy)
         # (2 of ((2 of (ATTR0@AUTH0,ATTR1@AUTH1,ATTR2@AUTH2)),ATTR3@AUTH3))
         # acp1='(%d of (%s))'%(6,", ".join(attrs[0:10]))
         # acp2='(%d of (%s))'%(6,", ".join(attrs[10:20]))
@@ -59,10 +71,11 @@ class ABPVSS():
     def verify(self, C, proofs):
         # The coefficient can be performed before verification
         policy = self.util.createPolicy(C['policy'])
-        attrs = ["ATTR%d@AUTH%d" % (j,j) for j in range(0, self.cpabe.N)]
-        random.shuffle(attrs)        
+        # attrs = ["ATTR%d@AUTH%d" % (j,j) for j in range(0, self.cpabe.N)]
+        # random.shuffle(attrs)        
         coeffs = self.util.getCoefficients(policy)        
-        
+        attrs =[k for k in coeffs]
+        # print(attrs)
 
         ts=time.time()
         Cp=proofs["Cp"]
@@ -74,7 +87,10 @@ class ABPVSS():
         if Cp["C0"]!=Mhat* (self.cpabe.egg ** (shat*self.group.hash(GID, ZR))) * (C["C0"]**c):
             return False
         for attr in shareshat:
-            auth =attr.split("@")[1]
+            # auth =attr.split("@")[1]
+            auth =attr.split("@")[1].split("_")[0]
+            # print(self.cpabe.pks[auth])
+            # print(auth,attr)
             if Cp["C1"][attr]!= self.cpabe.pks[auth]**(shareshat[attr]*self.group.hash(attr, ZR)) * (C["C1"][attr] ** c):
                 return False
                 
@@ -92,7 +108,7 @@ class ABPVSS():
         
         for u in K:
             if u!="S":
-                auth =u.split("@")[1]
+                auth =u.split("@")[1].split("_")[0]
                 if pair(C["C1"][u],self.cpabe.g) != \
                     pair(self.cpabe.pks[auth],K[u]):
                     return False
@@ -130,10 +146,14 @@ class ABPVSS():
     def reconstruct(self, C, proofs,rand_msg):
         GID=proofs["GID"]
         shareshat=proofs["shareshat"]
+        attrs=[k for k in shareshat]
+        # print(attrs)
+        # random.shuffle(attrs)        
         K={"S":[]}
-        for i in range(0,self.cpabe.t):
-            attr="ATTR%d@AUTH%d" % (i,i)
-            auth =attr.split("@")[1]
+        for i in range(0,self.cpabe.N):
+            # attr="ATTR%d@AUTH%d" % (i,i)
+            attr=attrs[i]            
+            auth =attr.split("@")[1].split("_")[0]
             Ku=self.cpabe.keygen(GID, C["C1"][attr], attr, self.cpabe.sks[auth])            
             K[attr]=Ku
             K["S"].append(attr)
@@ -145,7 +165,7 @@ class ABPVSS():
         ts=time.time()
         if not self.checkKey(C, K, GID):
             return -1
-        print("ABPVSS reconstruct verification1 cost","cost:",time.time()- ts)                
+        print("ABPVSS reconstruct verification1 ","cost:",time.time()- ts)                
         
 
         # ts=time.time()
@@ -157,10 +177,12 @@ class ABPVSS():
         # if not self.checkKey2(C,K,GID,dleqPrfs):
         #     return -1
         # print("ABPVSS reconstruct verification2 cost","cost:",time.time()- ts)                
-
+        ts=time.time()                
         rec_msg = self.cpabe.decrypt(C,K,GID)
         if rand_msg != rec_msg:
             return -2
+        print("ABPVSS reconstruct decryption ","cost:",time.time()- ts)                
+        
         return True
     
 
