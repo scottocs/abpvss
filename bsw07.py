@@ -1,17 +1,5 @@
 '''
-John Bethencourt, Brent Waters (Pairing-based)
- 
-| From: "Ciphertext-Policy Attribute-Based Encryption".
-| Published in: 2007
-| Available from: 
-| Notes: 
-| Security Assumption: 
-|
-| type:           ciphertext-policy attribute-based encryption (public key)
-| setting:        Pairing
-
-:Authors:    J Ayo Akinyele
-:Date:            04/2011
+"Ciphertext-Policy Attribute-Based Encryption".
 '''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.secretutil import SecretUtil

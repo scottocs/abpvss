@@ -6,8 +6,6 @@ import random
 import time,sys
 import setting
 
-
-
 N = setting.N
 t=setting.t
 

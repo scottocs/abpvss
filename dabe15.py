@@ -1,18 +1,5 @@
 """
 Rouselakis - Waters Efficient Statically-Secure Large-Universe Multi-Authority Attribute-Based Encryption
-
-| From:             Efficient Statically-Secure Large-Universe Multi-Authority Attribute-Based Encryption
-| Published in:     Financial Crypto 2015
-| Available from:   http://eprint.iacr.org/2015/016.pdf
-| Notes:            Implementation based on implementation (maabe_rw12.py)
-                    which cah be found here: https://sites.google.com/site/yannisrouselakis/rwabe
-
-* type:          attribute-based encryption (public key)
-* setting:       bilinear pairing group of prime order
-* assumption:    complex q-type assumption
-
-:Authors:		Yannis Rouselakis
-:Date:      	11/12
 """
 
 from charm.toolbox.pairinggroup import *

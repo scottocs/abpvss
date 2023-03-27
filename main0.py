@@ -1,4 +1,3 @@
-
 # from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 # from utils.newsecretutils import SecretUtil
 # import utils.newjson as newjson

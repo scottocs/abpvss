@@ -27,7 +27,7 @@ FQ2 = optimized_bn128_FQ2
 
 keccak_256 = web3.Web3.solidityKeccak
 
-# fmt: off
+
 # additional generators for BN128
 H1 = (
     FQ(9727523064272218541460723335320998459488975639302513747055235660443850046724),

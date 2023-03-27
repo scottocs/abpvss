@@ -3,7 +3,6 @@
 This is the proof of concept implementation of attribute-based publicly verifiable secret sharing (AB-PVSS) scheme. 
 
 
-
 ### python3 abpvss.py
 
 It invokes dabe.py and implement NIZK proofs. The NIZK proofs are obtained using Sigma protocol and Fiat-Shamir heuristic. 

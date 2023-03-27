@@ -1,15 +1,5 @@
 '''
 Lewko-Waters Decentralized Attribute-Based Encryption 
- 
-| Lewko, Allison, and Brent Waters, "Decentralizing Attribute-Based Encryption.", Appendix D
-| Published in: Eurocrypt 2011
-| Available from: http://eprint.iacr.org/2010/351.pdf
-
-* type:           encryption (identity-based)
-* setting:        bilinear groups (asymmetric)
-
-:Authors:    Gary Belvin
-:Date:           06/2011 
 '''
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
