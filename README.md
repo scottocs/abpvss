@@ -1,4 +1,4 @@
-# abpvss
+# attribute-based publicly verifiable secret sharing (AB-PVSS) scheme
 
 This is the proof of concept implementation of attribute-based publicly verifiable secret sharing (AB-PVSS) scheme. 
 
