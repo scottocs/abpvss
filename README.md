@@ -1,4 +1,4 @@
-# pvss_based_on_cpabe 
+# abpvss
 
 This is the proof of concept implementation of attribute-based publicly verifiable secret sharing (AB-PVSS) scheme. 
 
