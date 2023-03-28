@@ -7,7 +7,7 @@ This is the proof of concept implementation of attribute-based publicly verifiab
 
 It invokes dabe.py and implement NIZK proofs. The NIZK proofs are obtained using Sigma protocol and Fiat-Shamir heuristic. 
 
-### python3 abpvss.py
+### python3 dabe.py
 
 Test the proposed decentralized CP-ABE.
 
