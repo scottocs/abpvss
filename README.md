@@ -3,9 +3,9 @@
 This is the proof of concept implementation of attribute-based publicly verifiable secret sharing (AB-PVSS) scheme. 
 
 
-### python3 abpvss.py
+### python3 abpvss.py 2
 
-It invokes dabe.py and implement NIZK proofs. The NIZK proofs are obtained using Sigma protocol and Fiat-Shamir heuristic. 
+It invokes dabe.py and implement NIZK proofs to achieve AB-PVSS scheme. The NIZK proofs are obtained using Sigma protocol and Fiat-Shamir heuristic. 
 
 ### python3 dabe.py
 
@@ -18,6 +18,12 @@ Test the DBS version of SCRAPE PVSS scheme proposed in ACNS'17. Refer to [SCRAPE
 ### python3 scrapeDDH.py
 
 Test the DDH version of SCRAPE PVSS scheme proposed in ACNS'17. Refer to [SCRAPE PVSS](https://eprint.iacr.org/2017/216.pdf)
+
+
+### python3 Albatross.py
+
+Test Albatross PVSS scheme proposed in ASIACRYPT'20. Refer to [Albatross PVSS](https://eprint.iacr.org/2020/644.pdf)
+
 
 ### python3 bsw07.py
 
