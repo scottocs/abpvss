@@ -11,25 +11,6 @@ t=setting.t
 
 
 class SCRAPE():
-    # def dleq_distribute(self, shares):
-    #     w = self.group.random(ZR)
-    #     z=[0 for i in range(0,len(shares))]
-    #     a1=[0 for i in range(0,len(shares))]
-    #     a2=[0 for i in range(0,len(shares))]
-    #     c = self.group.hash(str(self.vs)+str(self.shat), ZR)
-        
-    #     for i in range(1, len(z)):
-    #         a1[i] = self.gp**w
-    #         a2[i] = self.pks[i]**w        
-    #         z[i] = w - shares[i] * c    
-        
-    #     return {"c":c, "a1":a1, "a2":a2, "z":z}
-
-
-    def dleq_verify_distribute(self, c, a1, a2, z):
-        
-        return True
-
 
 
     # setup()
@@ -47,6 +28,7 @@ class SCRAPE():
         self.S=self.group.random(G1)
 
     def distribute(self):
+        ts=time.time()
         s=self.group.random(ZR)        
         self.S=self.g**s
 
@@ -74,6 +56,7 @@ class SCRAPE():
         dist["shat"]=shat
         dist["vs"]=vs
         print("dis message size:",len(str(dist)))
+        print("ScrapeDBS distribution cost:",time.time()- ts)     
         return dist
 
 
@@ -130,7 +113,7 @@ class SCRAPE():
             if recon["a1"][i] != (self.g**recon["z"][i]) * (self.pks[i]**c)\
                 or recon["a2"][i] !=stidle[i]** recon["z"][i] * (dist["shat"][i] **c):
                 return -1
-        print("SCRAPE DDH reconstruction verification cost ",time.time()- starttime)
+        # print("SCRAPE DDH reconstruction verification cost ",time.time()- starttime)
 
         indexArr = [i for i in range(1,N+1)]
 
@@ -140,6 +123,7 @@ class SCRAPE():
         z=self.group.init(G1,1)
         for i in indexArr:    
             z *= stidle[i]**y[i]    
+        print("SCRAPE DDH reconstruction cost ",time.time()- starttime)
         if self.S!=z: 
             return -2
         return z

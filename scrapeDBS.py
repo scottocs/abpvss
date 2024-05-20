@@ -53,6 +53,7 @@ class SCRAPE():
 
            
     def distribute(self):
+        ts=time.time()
         s=self.group.random(ZR)
         self.S=self.gp**s
 
@@ -70,6 +71,7 @@ class SCRAPE():
         # print("G2",len(str(self.group.random(G2))))
         
         print("dis message size:",len(str(res)))
+        print("ScrapeDBS distribution cost:",time.time()- ts)     
         return res
 
 
@@ -112,17 +114,19 @@ class SCRAPE():
         for i in range(1, N+1):
             if pair(self.pks[i], stidle[i]) != pair(self.gp, dis["shat"][i]):
                 return -1
-        print("SCRAPE DBS reconstruction verification cost ",time.time()- starttime)
+        # print("SCRAPE DBS reconstruction verification cost ",time.time()- starttime)
+
+        # starttime=time.time()
 
         indexArr = [i for i in range(1,N+1)]
 
         random.shuffle(indexArr)
-        indexArr=indexArr[0:t]
+        indexArr=indexArr[0:t]        
         y = self.util.recoverCoefficients(indexArr)
         z=self.group.init(G2,1)
         for i in indexArr:    
             z *= stidle[i]**y[i]    
-
+        print("SCRAPE DBS reconstruction cost ",time.time()- starttime)
         if self.S!=z: 
             return -2
         return z

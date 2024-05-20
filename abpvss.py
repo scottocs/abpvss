@@ -23,7 +23,7 @@ class ABPVSS():
       
            
     def distribute(self,GID,M=None): 
-        ts=time.time()
+        
         attrs = ["ATTR%d@AUTH%d" % (j,j) for j in range(0, self.cpabe.N)]
         part=int(sys.argv[1])
         partAttrNums=int(self.cpabe.N/part)
@@ -45,17 +45,19 @@ class ABPVSS():
         # acp2='(%d of (%s))'%(6,", ".join(attrs[10:20]))
         # acp2='(%d of (%s))'%(6,", ".join(attrs[10:20]))
         # access_policy = '(2 of ((%s), (%s)))'%(acp1,acp2)
+        ts=time.time()
         if M==None:
             M = self.group.random(GT)        
         s = self.group.random(ZR)        
-        shares = self.util.calculateSharesDict(s, self.util.createPolicy(access_policy))
+        acpM=self.util.createPolicy(access_policy)
+        shares = self.util.calculateSharesDict(s, acpM)
         C = self.cpabe.encrypt(M, access_policy,GID,self.cpabe.pks,s,shares)    
 
         Mp = self.group.random(GT)
         # print("GT",len(str(self.group.random(GT))))
         # print("G1",len(str(self.group.random(G1))))
         sp = self.group.random(ZR)        
-        sharesp = self.util.calculateSharesDict(sp, self.util.createPolicy(access_policy))
+        sharesp = self.util.calculateSharesDict(sp, acpM)
         Cp = self.cpabe.encrypt(Mp, access_policy,GID,self.cpabe.pks,sp,sharesp)    
 
 
@@ -66,6 +68,7 @@ class ABPVSS():
         for attr in shares:
             shareshat[attr]=sharesp[attr] - shares[attr]*c
         proofs={"Cp":Cp,"c":c,"Mhat":Mhat,"shat":shat,"shareshat":shareshat,"GID":GID}
+        print("ABPVSS distribution cost:",time.time()- ts)     
         return {"C":C,"proofs":proofs}
 
     def verify(self, C, proofs):
@@ -165,7 +168,7 @@ class ABPVSS():
         ts=time.time()
         if not self.checkKey(C, K, GID):
             return -1
-        print("ABPVSS reconstruct verification1 ","cost:",time.time()- ts)                
+        # print("ABPVSS reconstruct verification1 ","cost:",time.time()- ts)                
         
 
         # ts=time.time()
@@ -177,7 +180,7 @@ class ABPVSS():
         # if not self.checkKey2(C,K,GID,dleqPrfs):
         #     return -1
         # print("ABPVSS reconstruct verification2 cost","cost:",time.time()- ts)                
-        ts=time.time()                
+        # ts=time.time()                
         rec_msg = self.cpabe.decrypt(C,K,GID)
         if rand_msg != rec_msg:
             return -2
