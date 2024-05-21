@@ -56,7 +56,7 @@ class SCRAPE():
         dist["shat"]=shat
         dist["vs"]=vs
         print("dis message size:",len(str(dist)))
-        print("ScrapeDBS distribution cost:",time.time()- ts)     
+        print("ScrapeDDH distribution cost:",time.time()- ts)     
         return dist
 
 
@@ -82,7 +82,7 @@ class SCRAPE():
             v=v * (dist["vs"][i]**codeword[i])
         if v != self.group.init(G2,1):
             return False
-        print("SCRAPE DDH verification cost ",time.time()- starttime)         
+        print("ScrapeDDH verification cost ",time.time()- starttime)         
         return True
 
     def reconstruct(self, dist):
@@ -113,7 +113,7 @@ class SCRAPE():
             if recon["a1"][i] != (self.g**recon["z"][i]) * (self.pks[i]**c)\
                 or recon["a2"][i] !=stidle[i]** recon["z"][i] * (dist["shat"][i] **c):
                 return -1
-        # print("SCRAPE DDH reconstruction verification cost ",time.time()- starttime)
+        # print("ScrapeDDH reconstruction verification cost ",time.time()- starttime)
 
         indexArr = [i for i in range(1,N+1)]
 
@@ -123,7 +123,7 @@ class SCRAPE():
         z=self.group.init(G1,1)
         for i in indexArr:    
             z *= stidle[i]**y[i]    
-        print("SCRAPE DDH reconstruction cost ",time.time()- starttime)
+        print("ScrapeDDH reconstruction cost ",time.time()- starttime)
         if self.S!=z: 
             return -2
         return z

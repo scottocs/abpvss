@@ -73,9 +73,9 @@ class PPVSS():
                 print(i)
                 return {"result": False, "cost": 0}
 
-        # print("Albatross LDEI verification cost ", time.time() - starttime)
-        time_cost = time.time() - starttime
-        return {"result": True, "cost": time_cost}
+        print("Albatross verification cost ", time.time() - starttime)
+        # time_cost = time.time() - starttime
+        # return {"result": True, "cost": time_cost}
 
     def local_LDEI(self,dist):
         v = self.group.init(G1, 1)
@@ -136,8 +136,8 @@ class PPVSS():
         assert DLEQ_verification == True
         Locol_LDEI_verification = self.local_LDEI(recon)
         assert Locol_LDEI_verification == True
-        time_cost = time.time() - starttime
-        # print("Albatross reconstruction verification cost ", time.time() - starttime)
+        # time_cost = time.time() - starttime
+        # print("Albatross reconstruct verification cost ", time.time() - starttime)
 
         indexArr = [i for i in range(1, N + 1)]
 
@@ -150,7 +150,7 @@ class PPVSS():
         if self.S != z:
             return -2
         print("Albatross reconstruction cost:",time.time()- starttime)                
-        return time_cost
+        # return time_cost
 
 
 groupObj = PairingGroup(setting.curveName)
@@ -161,12 +161,12 @@ rec_cost = 0
 n=1
 for i in range(n):
     dis = albatross.distribute(i)
-    ver_result = albatross.LDEI_verify(dis)
+    albatross.LDEI_verify(dis)
     # if i == 1:
     #     print("Albatross verification result: ", ver_result["result"])
-    ver_cost += ver_result["cost"]
-    rec_cost += albatross.reconstruct(dis, i)
-print("Albatross verification cost:", ver_cost/n)
+    # ver_cost += ver_result["cost"]
+    albatross.reconstruct(dis, i)
+# print("Albatross verification cost:", ver_cost/n)
 
 
 

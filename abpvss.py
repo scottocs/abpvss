@@ -90,6 +90,7 @@ class ABPVSS():
         if Cp["C0"]!=Mhat* (self.cpabe.egg ** (shat*self.group.hash(GID, ZR))) * (C["C0"]**c):
             return False
         for attr in shareshat:
+            
             # auth =attr.split("@")[1]
             auth =attr.split("@")[1].split("_")[0]
             # print(self.cpabe.pks[auth])
@@ -162,29 +163,33 @@ class ABPVSS():
             K["S"].append(attr)
         
         recon=K
-        print("rec message size:",len(str(recon)))        
+        if setting.curveName == "SS512":
+            print("rec message size:",len(str(recon)))        
 
-        # checkKey
-        ts=time.time()
-        if not self.checkKey(C, K, GID):
-            return -1
-        # print("ABPVSS reconstruct verification1 ","cost:",time.time()- ts)                
-        
-
-        # ts=time.time()
-        # dleqPrfs=self.genProofs2(C,K, GID)
-        # recon={}
-        # recon.update(K)
-        # recon.update(dleqPrfs)
-        # print("rec message size:",len(str(recon)))        
-        # if not self.checkKey2(C,K,GID,dleqPrfs):
-        #     return -1
-        # print("ABPVSS reconstruct verification2 cost","cost:",time.time()- ts)                
-        # ts=time.time()                
-        rec_msg = self.cpabe.decrypt(C,K,GID)
-        if rand_msg != rec_msg:
-            return -2
-        print("ABPVSS reconstruct decryption ","cost:",time.time()- ts)                
+            # # checkKey
+            ts=time.time()
+            if not self.checkKey(C, K, GID):
+                return -1
+            # print("ABPVSS reconstruct verification1 cost:",time.time()- ts)                
+            # ts=time.time()                
+            rec_msg = self.cpabe.decrypt(C,K,GID)
+            if rand_msg != rec_msg:
+                return -2
+            print("ABPVSS reconstruct1 cost:",time.time()- ts)    
+        else:            
+            dleqPrfs=self.genProofs2(C,K, GID)
+            recon={}
+            recon.update(K)
+            recon.update(dleqPrfs)
+            ts=time.time()
+            if not self.checkKey2(C,K,GID,dleqPrfs):
+                return -1
+            # print("ABPVSS reconstruct verification2 cost",time.time()- ts)                
+            # ts=time.time()                
+            rec_msg = self.cpabe.decrypt(C,K,GID)
+            if rand_msg != rec_msg:
+                return -2
+            print("ABPVSS reconstruct2 cost:",time.time()- ts)                
         
         return True
     
