@@ -25,6 +25,14 @@ class PPVSS():
         self.sks = [self.group.random(ZR) for i in range(0, N + 1)]
         self.pks = [self.g ** self.sks[i] for i in range(0, N + 1)]
         self.S = self.group.random(G1)
+        self.codeword = [self.group.init(ZR, 1)]
+        for i in range(1, N + 1):
+            vi = self.group.init(ZR, 1)
+            for j in range(1, N + 1):
+                if i != j:
+                    vi=vi*1/(self.group.init(ZR, i)-j)  
+                    # print(vi,i,j)
+            self.codeword.append(vi)
 
     def distribute(self, j):
         ts = time.time()
@@ -53,8 +61,8 @@ class PPVSS():
         dist["shat"] = shat
         # dist["vs"] = vs
         if j == 0:
-            print("Albatross dis message size:", len(str(dist)))
-        print("Albatross distribution cost:",time.time()- ts)     
+            print("Albatross dis message size %.2fKB" %( len(str(dist))%1024.))
+        print("Albatross distribution cost %.2fs"%(time.time()- ts))
         return dist
 
     def LDEI_verify(self, dist):
@@ -73,23 +81,16 @@ class PPVSS():
                 print(i)
                 return {"result": False, "cost": 0}
 
-        print("Albatross verification cost ", time.time() - starttime)
+        print("Albatross verification cost %.2fs"%(time.time() - starttime))
         # time_cost = time.time() - starttime
         # return {"result": True, "cost": time_cost}
 
     def local_LDEI(self,dist):
         v = self.group.init(G1, 1)
-        codeword = [self.group.init(ZR, 1)]
-        _p = self.util.genShares(0, t, N)
+        
         for i in range(1, N + 1):
-            vi = _p[i]
-            for j in range(1, N + 1):
-                if i != j:
-                    vi = vi * 1 / (i - j)
-            codeword.append(self.group.init(ZR, vi))
-        for i in range(1, N + 1):
-            v = v * (dist["vs"][i] ** codeword[i])
-            # assert dist["vs"][i] ** codeword[i] == 0
+            v = v * (dist["vs"][i] ** self.codeword[i])
+            # assert dist["vs"][i] ** self.codeword[i] == 0
         if v != self.group.init(G2, 1):
            return False
         return True
@@ -130,7 +131,7 @@ class PPVSS():
         recon["vs"] = stidle
         recon["shat"] = dist["shat"]
         if j == 1:
-            print("Albatross rec message size:", len(str(recon)))
+            print("Albatross rec message size %.2fKB"% (len(str(recon))/1024.))
         starttime = time.time()
         DLEQ_verification = self.dleq_verify(recon)
         assert DLEQ_verification == True
@@ -149,7 +150,7 @@ class PPVSS():
             z *= stidle[i] ** y[i]
         if self.S != z:
             return -2
-        print("Albatross reconstruction cost:",time.time()- starttime)                
+        print("Albatross reconstruction cost %.2fs"%(time.time()- starttime))                
         # return time_cost
 
 

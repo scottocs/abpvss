@@ -35,14 +35,13 @@ class DCPabe():
         self.t=t
         
     def encrypt(self,M,policy_str,GID,pks,s=None,shares=None): 
-        ts=time.time()
+        # ts=time.time()
         policy = self.util.createPolicy(policy_str)
-        a_list = self.util.getAttributeList(policy)
         
         if s==None:
             s = self.group.random(ZR)
             shares = self.util.calculateSharesDict(s, policy)
-        
+        # print("DABE enc1:",time.time()-ts)
         C0=M* self.egg ** (s*self.group.hash(GID, ZR))
         C1 = {}
         for i in shares.keys():

@@ -26,6 +26,15 @@ class SCRAPE():
         self.sks=[self.group.random(ZR) for i in range(0,N+1)]
         self.pks=[self.g**self.sks[i] for i in range(0,N+1)]
         self.S=self.group.random(G1)
+        self.codeword=[self.group.init(ZR,1)]
+        for i in range(1, N+1):            
+            vi = self.group.init(ZR,1)
+            for j in range(1,N+1):
+                if i!=j:
+                    vi=vi*1/(self.group.init(ZR, i)-j)  
+                    # print(vi,i,j)
+            self.codeword.append(vi)
+        # self.util.recoverCoefficients([i for i in range(1, self.cpabe.N+1)])
 
     def distribute(self):
         ts=time.time()
@@ -55,8 +64,8 @@ class SCRAPE():
         dist=dleqPrfs.copy()
         dist["shat"]=shat
         dist["vs"]=vs
-        print("dis message size:",len(str(dist)))
-        print("ScrapeDDH distribution cost:",time.time()- ts)     
+        print("distribute message size %.2fKB"%(len(str(dist))/1024.))
+        print("ScrapeDDH distribution cost %.2fs"%(time.time()- ts))
         return dist
 
 
@@ -71,18 +80,11 @@ class SCRAPE():
 
         # reed solomon check
         v=self.group.init(G2,1)
-        codeword=[self.group.init(ZR,1)]
-        for i in range(1, N+1):            
-            vi = self.group.init(ZR,1)
-            for j in range(1,N+1):
-                if i!=j:
-                    vi=vi*1/(i-j)  
-            codeword.append(self.group.init(ZR,vi))
+        
         for i in range(1, N+1):
-            v=v * (dist["vs"][i]**codeword[i])
-        if v != self.group.init(G2,1):
-            return False
-        print("ScrapeDDH verification cost ",time.time()- starttime)         
+            v=v * (dist["vs"][i]**self.codeword[i])
+        assert v == self.group.init(G2,1)            
+        print("ScrapeDDH verification cost %.2fs"%(time.time()- starttime))
         return True
 
     def reconstruct(self, dist):
@@ -104,7 +106,7 @@ class SCRAPE():
         dleqPrfs= {"c":c, "a1":a1, "a2":a2, "z":z}        
         recon=dleqPrfs.copy()
         recon["stidle"]=stidle
-        print("rec message size:",len(str(recon)))        
+        print("reconstruct message size %.2fKB"%(len(str(recon))/1024.))
         
         # Check DLEQ proofs by the recover
         starttime=time.time()
@@ -123,17 +125,15 @@ class SCRAPE():
         z=self.group.init(G1,1)
         for i in indexArr:    
             z *= stidle[i]**y[i]    
-        print("ScrapeDDH reconstruction cost ",time.time()- starttime)
-        if self.S!=z: 
-            return -2
+        print("ScrapeDDH reconstruction cost %.2fs"%(time.time()- starttime))
         return z
-
+        
 groupObj = PairingGroup(setting.curveName)
 scrape = SCRAPE(groupObj)
 print("N=%d,t=%d"%(N,t))
 dis= scrape.distribute()
-print(scrape.verify(dis))
-scrape.reconstruct(dis)
+scrape.verify(dis)
+assert scrape.S == scrape.reconstruct(dis)
 
 
 

@@ -7,10 +7,14 @@ from charm.toolbox.pairinggroup import *
 from .newpolicytree import *
 import sys
 
+
+
 class SecretUtil:
     def __init__(self, groupObj, verbose=True):
         self.group = groupObj
-
+        self.coeff={}
+        
+      
     #        self.parser = PolicyParser()
     def genCoeff(self, k):
         # print()
@@ -46,17 +50,17 @@ class SecretUtil:
     # shares is a dictionary
     def recoverCoefficients(self, list):
         """recovers the coefficients over a binary tree."""
-        coeff = {}
+        # coeff = {}
         list2 = [self.group.init(ZR, i) for i in list]
         for i in list2:
+            if int(i) in self.coeff:
+                continue
             result = 1
             for j in list2:
-                if not (i == j):
-                    # lagrange basis poly
+                if not (i == j):                                        
                     result *= (0 - j) / (i - j)
-            #                print("coeff '%d' => '%s'" % (i, result))
-            coeff[int(i)] = result
-        return coeff
+            self.coeff[int(i)] = result
+        return self.coeff
 
     def recoverSecret(self, shares):
         """take shares and attempt to recover secret by taking sum of coeff * share for all shares.
@@ -205,7 +209,8 @@ class SecretUtil:
                 self._compute_shares(shares[i+1], subtree.children[i], List)
 
     def strip_index(self, node_str):
-        if node_str.find('_') != -1: return node_str.split('_')[0]
+        if node_str.find('_') != -1: 
+            return node_str.split('_')[0]
         return node_str
 
     def createPolicy(self, policy_string):

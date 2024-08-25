@@ -3,6 +3,7 @@
 from pyparsing import *
 from .newnode import *
 import string
+import copy
 
 
 
@@ -88,7 +89,7 @@ class PolicyParser:
         elif op == 'of':
             values = self.evalStack(stack)
             threshold = self.evalStack(stack)
-            return createTree(op, values.copy(), int(str(threshold)))
+            return createTree(op, copy.deepcopy(values), int(str(threshold)))
         elif op == ',':
             op2 = self.evalStack(stack)
             op1 = self.evalStack(stack)
