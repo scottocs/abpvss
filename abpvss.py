@@ -1,5 +1,5 @@
  
-from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
 from utils.newsecretutils import SecretUtil
 import utils.newjson as newjson
 from charm.toolbox.ABEnc import ABEnc, Input, Output
@@ -45,13 +45,13 @@ class ABPVSS():
         # access_policy = '(2 of ((%s), (%s)))'%(acp1,acp2)
         ts=time.time()
         if M==None:
-            M = self.group.random(GT)        
+            M = self.group.random(G1)        
         s = self.group.random(ZR)        
         acpM=self.util.createPolicy(access_policy)
         shares = self.util.calculateSharesDict(s, acpM)
         C = self.cpabe.encrypt(M, access_policy,GID,self.cpabe.pks,s,shares)    
 
-        Mp = self.group.random(GT)
+        Mp = self.group.random(G1)
         sp = self.group.random(ZR)        
         sharesp = self.util.calculateSharesDict(sp, acpM)
         Cp = self.cpabe.encrypt(Mp, access_policy,GID,self.cpabe.pks,sp,sharesp)    
@@ -84,7 +84,7 @@ class ABPVSS():
         Mhat=proofs["Mhat"]
         shareshat=proofs["shareshat"]
         c = self.group.hash(str(C)+str(Cp), ZR)
-        if Cp["C0"]!=Mhat* (self.cpabe.egg ** (shat*self.group.hash(GID, ZR))) * (C["C0"]**c):
+        if Cp["C0"]!=Mhat* (self.cpabe.g ** (shat*self.group.hash(GID, ZR))) * (C["C0"]**c):
             return False
         for attr in shareshat:
             
@@ -147,7 +147,7 @@ if __name__ == "__main__":
     
     abpvss = ABPVSS(groupObj)
     print("N=%d,t=%d"%(abpvss.cpabe.N,abpvss.cpabe.t))
-    rand_msg = groupObj.random(GT)
+    rand_msg = groupObj.random(G1)
     GID="GID"
     trans = abpvss.distribute(GID,rand_msg)    
     print("distribute message size %.2fKB"%(len(str(trans))/1024.))

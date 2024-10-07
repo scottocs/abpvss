@@ -1,5 +1,5 @@
 
-from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
 from utils.newsecretutils import SecretUtil
 import utils.newjson as newjson
 from charm.toolbox.ABEnc import ABEnc, Input, Output
@@ -22,7 +22,7 @@ class DCPabe():
         
         self.g, self.gp = self.group.random(G1), self.group.random(G2)
         # self.g.initPP(); gp.initPP()
-        self.egg = pair(self.g, self.gp)
+        # self.egg = pair(self.g, self.gp)
         # shareholders are in [1, N]
 
         self.sks={}
@@ -42,7 +42,8 @@ class DCPabe():
             s = self.group.random(ZR)
             shares = self.util.calculateSharesDict(s, policy)
         # print("DABE enc1:",time.time()-ts)
-        C0=M* self.egg ** (s*self.group.hash(GID, ZR))
+        
+        C0=M* self.g ** (s*self.group.hash(GID, ZR))
         C1 = {}
         for i in shares.keys():
             j = self.util.strip_index(i)
@@ -70,7 +71,7 @@ class DCPabe():
             
             A *= K[attr]**(z[j] *self.group.hash(GID, ZR)/self.group.hash(attr, ZR))
         
-        return ct['C0'] / pair(A, self.gp) 
+        return ct['C0'] / A
 
 if __name__ == "__main__":
 # def main():   
@@ -86,7 +87,7 @@ if __name__ == "__main__":
     access_policy = '(%d of (%s))'%(t,", ".join(attrs))
     # (2 of ((2 of (ATTR0@AUTH0,ATTR1@AUTH1,ATTR2@AUTH2)),ATTR3@AUTH3))
     # acp1='(%d of (%s))'%(6,", ".join(attrs[0:10]))
-    rand_msg = groupObj.random(GT)
+    rand_msg = groupObj.random(G1)
     GID="GID"
     st=time.time()
     ct = cpabe.encrypt(rand_msg, access_policy,GID,cpabe.pks)    
